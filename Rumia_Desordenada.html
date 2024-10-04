@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumia Desorganizada</title>
+    <style>
+        body {
+            background-color: #f4f4f4; /* Color claro y moderno */
+            color: #333; /* Color de texto */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #34495e; /* Azul oscuro */
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50; /* Gris oscuro */
+        }
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            border-spacing: 0;
+            background-color: #f4f4f4; /* Mismo color de fondo que el cuerpo */
+        }
+        th, td {
+            border: 1px solid #bdc3c7; /* Gris claro */
+            padding: 12px;
+            text-align: center;
+            background-color: #ffffff; /* Color blanco */
+            transition: background-color 0.3s;
+        }
+        th {
+            background-color: #2980b9; /* Azul */
+            color: white;
+        }
+        th:hover, td:hover {
+            background-color: #d5dbdb; /* Gris suave */
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #27ae60; /* Verde */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #219653; /* Verde oscuro */
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ced4da; /* Gris */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #7b8d93; /* Color gris suave */
+        }
+    </style>
+    <script>
+        let problemCount = 1; // Contador de problemas
+
+        function toggleMark(cell) {
+            if (cell.innerHTML === '') {
+                cell.innerHTML = '✔️'; // Agrega check
+            } else if (cell.innerHTML === '✔️') {
+                cell.innerHTML = '❌'; // Cambia a equis
+            } else {
+                cell.innerHTML = ''; // Elimina marca
+            }
+        }
+
+        function generateAlternatives() {
+            const rows = document.querySelectorAll('.interactive-table tr');
+            let hasError = false;
+
+            for (let i = 1; i < rows.length; i++) {
+                const importantCell = rows[i].cells[1].innerHTML;
+                const urgentCell = rows[i].cells[2].innerHTML;
+                const problemInput = rows[i].cells[0].querySelector('input').value.trim();
+                const altCell = rows[i].cells[3];
+
+                // Reset error message
+                const errorMessage = rows[i].querySelector('.error');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+
+                // Check for empty problem input
+                if (!problemInput) {
+                    hasError = true;
+                    const errorText = document.createElement('div');
+                    errorText.className = 'error';
+                    errorText.innerText = 'Por favor, completa este campo.';
+                    rows[i].cells[0].appendChild(errorText);
+                }
+
+                // Check for selections
+                if (importantCell === '✔️' && urgentCell === '✔️') {
+                    altCell.innerHTML = 'Cuando y cómo';
+                } else if (importantCell === '✔️') {
+                    altCell.innerHTML = 'Cuando hacerlo';
+                } else if (urgentCell === '✔️') {
+                    altCell.innerHTML = 'Delegar';
+                } else {
+                    altCell.innerHTML = 'Posponer';
+                }
+            }
+
+            if (hasError) {
+                alert('Por favor, completa todos los campos requeridos antes de continuar.');
+            }
+        }
+
+        function addProblem() {
+            const table = document.querySelector('.interactive-table');
+            const newRow = table.insertRow(problemCount);
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Escribe tu problema aquí"></td>
+                <td onclick="toggleMark(this)"></td>
+                <td onclick="toggleMark(this)"></td>
+                <td></td>
+            `;
+            problemCount++;
+        }
+
+        function removeProblem() {
+            const table = document.querySelector('.interactive-table');
+            if (problemCount > 1) {
+                table.deleteRow(problemCount - 1);
+                problemCount--;
+            } else {
+                alert('Debes mantener al menos un problema.');
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Rumia Desorganizada</h1>
+
+    <table>
+        <tr>
+            <th>Importante</th>
+            <th>Urgente</th>
+            <th>Alternativas</th>
+        </tr>
+        <tr>
+            <td>✔️</td>
+            <td>❌</td>
+            <td>Cuando hacerlo</td>
+        </tr>
+        <tr>
+            <td>❌</td>
+            <td>✔️</td>
+            <td>Delegar</td>
+        </tr>
+        <tr>
+            <td>✔️</td>
+            <td>✔️</td>
+            <td>Cuando y cómo</td>
+        </tr>
+        <tr>
+            <td>❌</td>
+            <td>❌</td>
+            <td>Posponer</td>
+        </tr>
+    </table>
+
+    <h2>Tabla Interactiva</h2>
+    <p style="text-align: center;">Añade tus problemas y selecciona si son importantes y/o urgentes. Si haces clic dos veces, aparecerá una "x".</p>
+    <div class="button-container">
+        <button onclick="addProblem()">Agregar Problema</button>
+        <button onclick="removeProblem()">Quitar Problema</button>
+    </div>
+    <table class="interactive-table">
+        <tr>
+            <th>Problema</th>
+            <th>Importante</th>
+            <th>Urgente</th>
+            <th>Alternativas</th>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" placeholder="Escribe tu problema aquí">
+            </td>
+            <td onclick="toggleMark(this)"></td>
+            <td onclick="toggleMark(this)"></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div class="button-container">
+        <button onclick="generateAlternatives()">Generar Alternativas</button>
+    </div>
+
+    <footer>
+        Creado por GiuCanCode, Diana Saborio
+    </footer>
+
+</body>
+</html>
